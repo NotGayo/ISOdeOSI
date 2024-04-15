@@ -46,6 +46,28 @@ else
 	echo "no existe el comprimido"
 fi
 }
+
+function instalarMySQL()
+{
+aux=$(aptitude show mySQL | grep "State: installed")
+aux2=$(aptitude show mySQL | grep "Estado: instalado")
+aux3=$aux$aux2
+if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt-get install mysql-server
+	  	sudo systemctl start mysql.service
+	else
+		echo "mySQL ya estaba instalado iniciando el servicio"
+		sudo systemctl start mysql.service
+	fi 
+}
+
+function crear_usuario_basesdedatos()
+{
+
+}
+
 function salirMenu()
 {
 echo "Fin del Programa"
@@ -59,6 +81,8 @@ do
     echo -e "1 Eliminar la instalación de mysql\n"
     echo -e "2 Crea la nueva ubicación \n"
     echo -e "3 Copiar ficheros proyecto nueva ubicación \n"
+    echo -e "4 Instalar mySQL \n"
+    echo -e "5 Crear usuario Bases de Datos \n"
     echo -e "26 salir del Menu \n"
     	read -p "Elige una opcion:" opcionmenuppal
     case $opcionmenuppal in
