@@ -49,10 +49,10 @@ fi
 
 function instalarMySQL()
 {
-aux=$(aptitude show mySQL | grep "State: installed")
-aux2=$(aptitude show mySQL | grep "Estado: instalado")
-aux3=$aux$aux2
-if [ -z "$aux3" ]
+	aux=$(aptitude show mySQL | grep "State: installed")
+	aux2=$(aptitude show mySQL | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
 	then 
 		echo "instalando ..."
 		sudo apt-get install mysql-server
@@ -63,11 +63,139 @@ if [ -z "$aux3" ]
 	fi 
 }
 
-function crear_usuario_basesdedatos()
+function crearUsuarioBasesdedatos()
 {
-
+	mysql -u $USER -p < script5.sql
 }
 
+function crearbasededatos()
+{
+	mysql -u $USER -p < script.sql
+}
+
+
+
+function ejecutarEntornoVirtual()
+{
+	        	
+	
+	
+	aux=$(aptitude show python3-pip | grep "State: installed")
+	aux2=$(aptitude show python3-pip | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt-get install python3-pip
+	  	
+	else
+		echo "python3-pip ya estaba instalado iniciando el servicio"
+		
+	fi
+	
+	aux=$(aptitude show python3-dev | grep "State: installed")
+	aux2=$(aptitude show python3-dev | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt-get install python3-dev
+	  	
+	else
+		echo "python3-dev ya estaba instalado iniciando el servicio"
+		
+	fi
+	
+	aux=$(aptitude show build-essential | grep "State: installed")
+	aux2=$(aptitude show build-essential | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt-get install build-essential
+	  	
+	else
+		echo "build-essential ya estaba instalado iniciando el servicio"
+		
+	fi
+	
+	aux=$(aptitude show libssl-dev | grep "State: installed")
+	aux2=$(aptitude show libssl-dev | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt-get install libssl-dev
+	  	
+	else
+		echo "libssl-dev ya estaba instalado iniciando el servicio"
+		
+	fi
+	
+	aux=$(aptitude show libffi-dev | grep "State: installed")
+	aux2=$(aptitude show libffi-dev | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt-get install libffi-dev
+	  	
+	else
+		echo "libffi-dev ya estaba instalado iniciando el servicio"
+		
+	fi
+	
+	aux=$(aptitude show python3-setuptools | grep "State: installed")
+	aux2=$(aptitude show python3-setuptools | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt-get install python3-setuptools
+	  	
+	else
+		echo "python3-setuptools ya estaba instalado iniciando el servicio"
+		
+	fi
+	
+	aux=$(aptitude show python3-venv | grep "State: installed")
+	aux2=$(aptitude show python3-venv | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt-get install python3-venv
+	  	
+	else
+		echo "python3-venv ya estaba instalado iniciando el servicio"
+		
+	fi
+	      
+	cd /var/www/formulariocitas
+	rm venv
+	python3 -m venv venv
+	source venv/bin/activate
+}
+
+
+function instalarLibreriasEntornoVirtual()
+{	
+	source venv/bin/activate
+	sudo apt-get update python3-pip
+	pip install -r formulariocitas/requirements.txt
+	
+}
+
+function probandotodoconservidordedesarrollodeflask()
+{
+	python3 formulariocitas/app.py
+}
+
+
+function instalarNGINX()
+{
+	
+}
 function salirMenu()
 {
 echo "Fin del Programa"
@@ -83,12 +211,25 @@ do
     echo -e "3 Copiar ficheros proyecto nueva ubicación \n"
     echo -e "4 Instalar mySQL \n"
     echo -e "5 Crear usuario Bases de Datos \n"
+    echo -e "6 Crear base de datos \n"
+    echo -e "7 Ejectuar entorno virtual\n"
+    echo -e "8 Instalar las librerias del entorno virtual"
+    echo -e "9 Probando todo con servidor de desarrollo de flask"
+    echo -e "10 Instalar NGINX"
     echo -e "26 salir del Menu \n"
     	read -p "Elige una opcion:" opcionmenuppal
     case $opcionmenuppal in
         	0) empaquetaycomprimeFicherosProyecto;;
         	1) eliminarMySQL;;
-   	 2) crearNuevaUbicacion;;
+   	 	2) crearNuevaUbicacion;;
+   	 	3) copiarFicherosProyectoNuevaUbicacion;;
+   	 	4) instalarMySQL;;
+   	 	5) crearUsuarioBasesdedatos;;
+   	 	6) crearbasededatos;;
+   	 	7) ejecutarEntornoVirtual;;
+   	 	8) instalarLibreriasEntornoVirtual;;
+   	 	9) probandotodoconservidordedesarrollodeflask;;
+   	 	10)instalarNGINX;;
    	 26) salirMenu;;
    	 *) ;;
     esac
