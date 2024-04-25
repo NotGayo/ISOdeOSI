@@ -6,21 +6,21 @@ function empaquetaycomprimeFicherosProyecto()
 }
 function eliminarMySQL()
 {
-#Para el servicio
-sudo service mysql stop
-#Elimina los paquetes +ficheros de configuración + datos
-sudo apt-get purge mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
-#servidor MySQL se desinstale completamente sin dejar archivos de residuos.
-sudo apt-get autoremove
-#Limpia la cache
-sudo apt-get autoclean
-#Para cerciorarnos de que queda todo limpio:
-#Eliminar los directorios de datos de MySQL:
-sudo rm -rf /var/lib/mysql
-#Eliminar los archivos de configuración de MySQL:
-sudo rm -rf /etc/mysql/
-#Eliminar los logs
-sudo rm -rf /var/log/mysql
+	#Para el servicio
+	sudo service mysql stop
+	#Elimina los paquetes +ficheros de configuración + datos
+	sudo apt-get purge mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
+	#servidor MySQL se desinstale completamente sin dejar archivos de residuos.
+	sudo apt-get autoremove
+	#Limpia la cache
+	sudo apt-get autoclean
+	#Para cerciorarnos de que queda todo limpio:
+	#Eliminar los directorios de datos de MySQL:
+	sudo rm -rf /var/lib/mysql
+	#Eliminar los archivos de configuración de MySQL:
+	sudo rm -rf /etc/mysql/
+	#Eliminar los logs
+	sudo rm -rf /var/log/mysql
 }
 
 function crearNuevaUbicacion()
@@ -180,9 +180,10 @@ function ejecutarEntornoVirtual()
 
 function instalarLibreriasEntornoVirtual()
 {	
+	cd /var/www/formulariocitas
 	source venv/bin/activate
 	sudo apt-get update python3-pip
-	pip install -r formulariocitas/requirements.txt
+	pip install -r requirements.txt
 	
 }
 
@@ -194,8 +195,85 @@ function probandotodoconservidordedesarrollodeflask()
 
 function instalarNGINX()
 {
+	aux=$(aptitude show NGINX | grep "State: installed")
+	aux2=$(aptitude show NGINX | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ -z "$aux3" ]
+	then 
+		echo "instalando ..."
+		sudo apt update
+		sudo apt-get install nginx
+	else
+		echo "NGINX ya estaba instalado iniciando el servicio"
+	fi 
+}
+
+function arrancarNGINX()
+{
+	sudo systemctl start nginx
+	sudo systemctl status nginx
+}
+
+function testearPuertosNGINX()
+{	
+	sudo apt install net-tools
+	sudo netstat -anp | grep nginx
+}
+
+function visualizarIndex()
+{
+	aux=$(which google-chrome | grep "State: installed")
+	aux2=$(aptitude show google-chrome | grep "Estado: instalado")
+	aux3=$aux$aux2
+	if [ which google-chrome ]
+	then 
+		echo "instalando ..."
+		sudo apt update
+		sudo apt install wget
+		wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+		sudo dpkg -i google-chrome-stable_current_amd64.deb
+		sudo apt-get install -f
+	else
+		echo "chrome ya estaba instalado iniciando el servicio"
+	fi 
+	
+	google-chrome http://127.0.0.1
+}
+
+function personalizarIndex()
+{
+	sudo mv /home/$USER/index.html /var/www/html/index.nginx-debian.html
+	google-chrome http://127.0.0.1
+
+}
+
+
+function instalarGunicorn()
+{
+	cd /var/www/formulariocitas
+	source venv/bin/activate
+	pip install gunicorn
+}
+
+function configurarGunicorn()
+{	
+
+	cd /var/www/formulariocitas
+	rm wsgi.py
+	touch wsgi.py
+	echo "from app import app" > wsgi.py
+	echo 'if __name__ =="__main__":' >> wsgi.py
+	echo "	app.run()" >> wsgi.py
+	source venv/bin/activate
+	gunicorn --bind 127.0.0.1:5001 wsgi:app
+	
+	
+	
+	
+	
 	
 }
+
 function salirMenu()
 {
 echo "Fin del Programa"
@@ -213,9 +291,15 @@ do
     echo -e "5 Crear usuario Bases de Datos \n"
     echo -e "6 Crear base de datos \n"
     echo -e "7 Ejectuar entorno virtual\n"
-    echo -e "8 Instalar las librerias del entorno virtual"
-    echo -e "9 Probando todo con servidor de desarrollo de flask"
-    echo -e "10 Instalar NGINX"
+    echo -e "8 Instalar las librerias del entorno virtual \n"
+    echo -e "9 Probando todo con servidor de desarrollo de flask \n"
+    echo -e "10 Instalar NGINX \n"
+    echo -e "11 Arrancar NGINX \n" 
+    echo -e "12 Testear puertos NGINX \n"
+    echo -e "13 Visualizar index \n"
+    echo -e "14 Personalizar index \n"
+    echo -e "15 Instalar Gunicorn \n"
+    echo -e "16 Configurar Gunicorn \n"
     echo -e "26 salir del Menu \n"
     	read -p "Elige una opcion:" opcionmenuppal
     case $opcionmenuppal in
@@ -229,7 +313,13 @@ do
    	 	7) ejecutarEntornoVirtual;;
    	 	8) instalarLibreriasEntornoVirtual;;
    	 	9) probandotodoconservidordedesarrollodeflask;;
-   	 	10)instalarNGINX;;
+   	 	10) instalarNGINX;;
+   	 	11) arrancarNGINX;;
+   	 	12) testearPuertosNGINX;;
+   	 	13) visualizarIndex;;
+   	 	14) personalizarIndex;;
+   	 	15) instalarGunicorn;;
+   	 	16) configurarGunicorn;;
    	 26) salirMenu;;
    	 *) ;;
     esac
