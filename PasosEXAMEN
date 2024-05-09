@@ -1,7 +1,5 @@
 Descargase menu.sh, index.html, formulariocitas.zip (de la semana 11)
 
-tar -czvf formulariocitas.tar.gz /home/ikadmin/formulariocitas //compr
-
 Crear la carpeta home/lsi/formulariocitas y guardar lo del zip 
 
 tar -xf formulariocitas.tar.gz //desc
@@ -9,3 +7,15 @@ tar -xf formulariocitas.tar.gz //desc
 Guardar en home/lsi <- menu.sh e index.html
 Ejectuar los pasos 1-26
 
+
+
+
+
+
+
+
+
+
+
+
+tar -czvf formulariocitas.tar.gz /home/ikadmin/formulariocitas //compr
