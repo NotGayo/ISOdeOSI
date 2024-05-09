@@ -373,23 +373,17 @@ function copiarServidorRemoto()
 	fi
 	
 	#arrancar (sirve de comprobacion) ssh
-	aux4=$(systemctl status ssh | grep "Active: active")
-	aux5=$(systemctl status ssh | grep "Activo: activo")
-	aux6=$aux$aux2
- 	if [ -z "$aux6"] 
-  	then
-		sudo systemctl start ssh
-  	else
-   		echo -e "YA ESTA ACTIVADO"
+	
+	sudo systemctl start ssh
 	
 	#solicitar ip
-	ip = ""
+	
 	read -p "Introduce una ip" ip
 	
 	#copiar archivos al servidor remoto
 	
-	scp /home/$USER/formulariocitas.tar.gz $USER@$ip:/home/$USER
-	scp /home/$USER/menu.sh $USER@$ip:/home/$USER
+	scp /home/$USER/formulariocitas.tar.gz $USER@$ip:/tmp
+	scp /home/$USER/menu.sh $USER@$ip:/tmp
 	
 	ssh $USER@$ip "bash -x menu.sh"
 	
