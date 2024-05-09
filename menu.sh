@@ -355,7 +355,7 @@ function verNginxLogs()
 
 function copiarServidorRemoto()
 {
-	#comprbar e instalar openssh-server
+	
 	aux=$(aptitude show openssh-server | grep "State: installed")
 	aux2=$(aptitude show openssh-server | grep "Estado: instalado")
 	aux3=$aux$aux2
@@ -371,50 +371,61 @@ function copiarServidorRemoto()
 		
 	fi
 	
-	#arrancar (sirve de comprobacion) ssh
+	#arrancar (sirve de comprovacion) ssh
 	aux4=$(systemctl status ssh | grep "Active: active")
 	aux5=$(systemctl status ssh | grep "Activo: activo")
 	aux6=$aux$aux2
- 	if [ -z "$aux6"] 
+ 	if [ -z "$aux6" ] 
   	then
 		sudo systemctl start ssh
   	else
    		echo -e "YA ESTA ACTIVADO"
 	
-	#solicitar ip
+	#pedir ip
 	ip = ""
 	read -p "Introduce una ip" ip
 	
-	#copiar archivos al servidor remoto
-	
+	#copiar archivos 
 	scp /home/$USER/formulariocitas.tar.gz $USER@$ip:/home/$USER
 	scp /home/$USER/menu.sh $USER@$ip:/home/$USER
 	
 	ssh $USER@$ip "bash -x menu.sh"
-	
+	fi
 	
 }
 
 function controlarIntentosConexionSSH()
 {
-	gedit detectarintentosfallidos.sh
-	cat /var/log/auth.log  > auth.log.txt
-	less auth.log.txt | tr -s ' ' '@' > auth.log.lineaporlinea.txt
-	buscar="authentication@failure"
-	echo -e "Mes\tDía\tHora\tUsuario\tComando\n"
-	echo -e "____________________________\n"
-	for linea in `less auth.log.lineaporlinea.txt | grep $buscar` 
+	
+	#cogemos todas las lineas que nos intresen y las mandamos aun txt
+	cat /var/log/auth.log | grep sshd | grep -E "Failed password|Accepted password" > auth.log.txt
+	zcat /var/log/auth.log* 2> /dev/null | grep sshd | grep -E "Failed password|Accepted password"	>> auth.log.txt
+	
+	less auth.log.txt | tr -s ' ' '@' > auth.log.lineas.txt
+	aux1="Failed@Password"
+	aux2="Accepted@Password"
+	
+	#extraemos
+	while IFS= read -r linea;
+	
 	do
-   		user=`echo $linea | cut -d@ -f15`
-   		comando=`echo $linea | cut -d@ -f6`
-   		dia=`echo $linea | cut -d@ -f2`
-   		mes=`echo $linea | cut -d@ -f1`
-   		hora=`echo $linea | cut -d@ -f3`
-   	echo -e "$mes\t$dia\t$hora\t$user\t$comando\n"
-	done
-	rm auth.log.txt  auth.log.lineaporlinea.txt
-
+	
+		usuario=$(echo $linea | cut -d@ -f4)
+    		comando=$(echo $linea | cut -d@ -f6)
+    		dia=$(echo $linea | cut -d@ -f2)
+    		mes=$(echo $linea | cut -d@ -f1)
+    		hora=$(echo $linea | cut -d@ -f3)
+		
+		if [ "$comando" = "Accepted" ]; then
+        		echo -e "\"Status: [accept] Name: $usuario Fecha: $mes, $dia, $hora\""
+    		else
+        		echo -e "\"Status: [fail] Name: $usuario Fecha: $mes, $dia, $hora\""
+    		fi
+	done < auth.log.lineas.txt
+	
+	
 }
+
 
 
 function salirMenu()
